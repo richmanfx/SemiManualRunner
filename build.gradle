@@ -1,13 +1,38 @@
+// Версия, добавится к названию jar-файла
 version '1.0'
 
+// Плагин java - добавляет компиляцию Java, тестирование, генерацию Javadoc и возможности комплектации проекта
 apply plugin: 'java'
 
-sourceCompatibility = 1.5
+// Плагин  application - добавляет task-и для запуска и комплектации Java-проекта как приложения для работы в командной строке
+// Запускать приложение: "gradlew run"
+apply plugin: 'application'
+// Класс с точкой входа main() для плагина "application"
+mainClassName = 'ru.r5am.SemiManualRunner'
 
+// Указать компилятору кодировку исходников - UTF-8
+[ compileJava, compileTestJava ]*.options*.encoding = 'UTF-8'
+
+// Объявление мест поиска зависимостей для проекта
 repositories {
     mavenCentral()
 }
 
+// Зависимости для приложения и тестирования кода
 dependencies {
+    compile     group: 'args4j', name: 'args4j-site', version: '2.33'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+// Кастомизация выходного JAR-файла
+jar {
+    baseName = 'SemiManualRunner'		// Название jar-файла на выходе
+    manifest {							// В файл MANIFEST.MF
+        attributes(
+                "Generated-By": "Gradle",
+                "Main-Class": mainClassName,
+                "Built-By": "Александр Ящук (Aleksandr Jashhuk), R5AM",
+                // "Class-Path": "library/help-share.jar library/jewt.jar "
+        )
+    }
 }
