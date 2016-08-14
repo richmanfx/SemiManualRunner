@@ -4,6 +4,6 @@ package ru.r5am;
 
 public class SemiManualRunner {
     public static void main(String[] args) {
-        System.out.println("Привет!");
+        System.out.println("Privet! Привет!");
     }
 }
