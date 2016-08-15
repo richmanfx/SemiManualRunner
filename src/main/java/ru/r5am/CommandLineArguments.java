@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-// import org.apache.commons.lang3.builder.ToStringBuilder;
-// import org.apache.commons.lang3.builder.ToStringStyle;
+ import org.apache.commons.lang3.builder.ToStringBuilder;
+ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.Argument;
 
@@ -15,9 +15,15 @@ import org.kohsuke.args4j.Argument;
  */
 class CommandLineArguments implements Serializable {
 
+    @Option(name = "-t",
+            aliases = "--testnumber",
+            usage = "The number of the running test.",
+            required = true          // Обязательный параметр
+    )
+    String testNumber;
+
     @Option(name = "-p",            // Короткий вариант
             aliases = "--prod",     // длинный вариант
-            // required = false,       // Необязательный параметр
             usage = "To use a configuration file for the product server."
     )
     boolean production;
@@ -32,9 +38,9 @@ class CommandLineArguments implements Serializable {
     @Argument
     List<String> extraArgs = new ArrayList<>();
 
-//    @Override
-//    public String toString() {
-//        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-//    }
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 
 }
