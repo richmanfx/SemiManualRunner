@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ONLINE_DATA_DOCUMENT>
+    <TEST_DESCRIPTION>Получение архивной справки, архивной копии или архивной выписки</TEST_DESCRIPTION>
+    <PARAMETERS>
+        <NAME>REGION_PORTAL</NAME>
+        <VALUE>true</VALUE>
+    </PARAMETERS>      
+	<PARAMETERS>
+        <NAME>userPIN</NAME>
+        <VALUE></VALUE>
+    </PARAMETERS>
+    <PARAMETERS>
+        <NAME>userType</NAME>
+        <VALUE>USER</VALUE>
+    </PARAMETERS>
+    <PARAMETERS>
+        <NAME>loginType</NAME>
+        <VALUE>PASSWORD</VALUE>
+    </PARAMETERS>
+    <PARAMETERS>
+        <NAME>gotoRegion</NAME>
+        <VALUE>Тюменская область</VALUE>
+    </PARAMETERS>
+	<PARAMETERS>
+        <NAME>serviceDirectLink</NAME>
+        <VALUE>http://testlk.admtyumen.ru/lk/catalog/grServices/service.htm?id=1547@egServiceTarget</VALUE>
+        <!-- <VALUE>http://uslugi.admtyumen.ru/lk/catalog/grServices/service.htm?id=1547@egServiceTarget</VALUE> -->
+    </PARAMETERS>
+    <PARAMETERS>
+        <NAME>serviceDepartmentName</NAME>
+        <VALUE></VALUE>
+    </PARAMETERS>
+    <PARAMETERS>
+        <NAME>serviceSubDepartmentName</NAME>
+        <VALUE></VALUE>
+    </PARAMETERS>
+    <PARAMETERS>
+        <NAME>serviceName</NAME>
+        <VALUE>Исполнение запросов</VALUE>
+    </PARAMETERS>	
+    <PARAMETERS>
+        <NAME>subServiceName</NAME>
+        <VALUE></VALUE>
+    </PARAMETERS>
+	<PARAMETERS>
+		<NAME>pushSendRequestButton</NAME>
+		<VALUE>true</VALUE>
+	</PARAMETERS>
+	<PARAMETERS>
+		<NAME>pushCreateNewDraft</NAME>
+		<VALUE>true</VALUE>
+	</PARAMETERS>	
+	<PARAMETERS>
+		<NAME>hasNoIdSpecified</NAME>
+		<VALUE>false</VALUE>
+	</PARAMETERS>
+    <PARAMETERS>
+        <NAME>script</NAME>
+        <VALUE>	
++|Заполняю заявление|||!
+@|Наименование органа местного самоуправления|c||Администрация Упоровского МР!
+@|Статус заявителя|c||Физическое лицо!
+@|Фамилия заявителя|-||#userSurname!
+@|Имя|-||#userFirstName!
+@|Отчество|-||#userMiddleName!
+@|Серия паспорта|-|account|#passportSerie!
+@|Номер паспорта|-||#passportNumber!
+@|Орган, выдавший документ|-||#passportOrganization!
+@|Дата выдачи документа|-|date;mask|#passportDate!
+@|Место жительства|-||#address!
+#|Данные по заявлению|||!
+@|Вид запрашиваемого документа|c|expand|архивная выписка!
+@|Наименование организации, издавшей документ|-||Наименование организации, издавшей документ!
+@|Предмет запрашиваемого документа|-||Предмет запрашиваемого документа!
+#|Получение результата|||!
+@|Адрес, на который отослать ответ/решение|-|expand|#address!
+p||||!
+    </VALUE>
+    </PARAMETERS>
+    <SERVICE_NAME></SERVICE_NAME>
+    <URL></URL>
+</ONLINE_DATA_DOCUMENT>
