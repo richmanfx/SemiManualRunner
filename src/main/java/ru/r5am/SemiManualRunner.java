@@ -5,10 +5,13 @@ package ru.r5am;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -34,7 +37,7 @@ public class SemiManualRunner {
         // Имена конфигурационных файлов
         String ONLINE_SETTINGS_CONFIG_FILE = "online.settings.xml";
         String TEST_RUNTIME_CONFIG_FILE = "test.runtime.xml";
-        String TESTPROPERTIES_ONLINE_FILE = "testProperties.online.xml";
+        String TEST_PROPERTIES_ONLINE_FILE = "testProperties.online.xml";
 
         // Форматируем дату и время, выставляем временнУю зону Москвы
         TimeZone tz = TimeZone.getTimeZone("Europe/Moscow");
@@ -83,7 +86,7 @@ public class SemiManualRunner {
         try {
             if (arguments.firefox) {
                 System.out.println("Используется Firefox");
-//                driver = startFirefox();
+                driver = startFirefox(arguments.browserResolution);
             } else {
                 System.out.println("Используется Chrome (по-умолчанию)");
                 driver = startChrome(PATH_TO_CHROMEDRIVER_EXE, arguments.browserResolution);
@@ -114,7 +117,7 @@ public class SemiManualRunner {
         // Проверить залогинены ли в личном кабинете и разлогиниться
         boolean status = getLoginStatus(driver);
         if(status) loginOut(driver);       // Разлогиниваемся
-
+/*
         // Логинимся
         AuthESIA login = new AuthESIA();
         login.goToPageSNILS(driver);
@@ -126,7 +129,7 @@ public class SemiManualRunner {
         } else {
             name = "userNameTest";
         }
-        String sNILNumbers = getValueFromXMLConfig(TESTPROPERTIES_ONLINE_FILE , pathToConfigs,
+        String sNILNumbers = getValueFromXMLConfig(TEST_PROPERTIES_ONLINE_FILE , pathToConfigs,
                 "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='" + name + "']/following-sibling::*"
         );
         login.inputSNILS(driver, sNILNumbers);      // Ввести СНИЛС
@@ -138,12 +141,12 @@ public class SemiManualRunner {
         } else {
             password = "userPasswordTest";
         }
-        String userPassword = getValueFromXMLConfig(TESTPROPERTIES_ONLINE_FILE , pathToConfigs,
+        String userPassword = getValueFromXMLConfig(TEST_PROPERTIES_ONLINE_FILE , pathToConfigs,
                 "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='" + password + "']/following-sibling::*"
         );
         login.inputPassword(driver, userPassword);
         login.setInputESIAButton(driver);           // Нажать кнопку 'Войти'
-
+*/
         // Ждём 15 секунд - посмотреть на результат до закрытия браузера
         sleep(15000);
 
@@ -216,15 +219,32 @@ public class SemiManualRunner {
      */
     private static WebDriver startChrome(String pathToChromedriverExe, String browserResolution) {
         System.setProperty("webdriver.chrome.driver", pathToChromedriverExe);   // Выставить путь к ChromeDriver
-
         // Опции командной строки браузера
         ChromeOptions option = new ChromeOptions();
-        option.addArguments("--window-size=" + browserResolution); // Но более текущего разрешения экрана не делает окно
+        if(browserResolution != null)
+           option.addArguments("--window-size=" + browserResolution); // Более текущего разрешения экрана не делает окно
         WebDriver driver = new ChromeDriver(option);
         if(Objects.equals(browserResolution, null))
             driver.manage().window().maximize();                   // Максимизировать размер окна браузера
         return driver;
     }
+
+    /**
+     * Запускает браузер Firefox с максимальным или заданным размером окна
+     * @return driver - екземпляр WebDriver
+     */
+    private static WebDriver startFirefox(String browserResolution) {
+        WebDriver driver = new FirefoxDriver();
+        if(Objects.equals(browserResolution, null))
+            driver.manage().window().maximize();                   // Максимизировать размер окна браузера
+        else {
+            int x = Integer.parseInt(browserResolution.split(",")[0]);
+            int y = Integer.parseInt(browserResolution.split(",")[1]);
+            driver.manage().window().setSize(new Dimension(x, y));
+        }
+        return driver;
+    }
+
 /*      Пока не нужен - не понял как искать параметры в DOM-документе
     private static NodeList getXMLConfigNodeList(String ONLINE_SETTINGS_CONFIG_FILE, String pathToConfigs)
                         throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {

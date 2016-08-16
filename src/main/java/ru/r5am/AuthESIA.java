@@ -5,9 +5,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
- * Created by Zoer on 16.08.2016.
+ * Created by Aleksandr Jashhuk (Zoer) on 16.08.2016.
+ * Класс содержит методы для логирования через ЕИСА
  */
-public class AuthESIA {
+class AuthESIA {
 
     /**
      *  Переход на страницу авторизации по СНИЛС
