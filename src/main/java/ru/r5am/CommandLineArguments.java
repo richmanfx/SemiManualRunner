@@ -1,15 +1,13 @@
 package ru.r5am;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
- import org.apache.commons.lang3.builder.ToStringBuilder;
- import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.Argument;
+
+import java.io.Serializable;
 
 /**
+ * Описание ожидаемых аргументов командной строки
  * Created by Zoer on 15.08.2016.
  * @author  Aleksandr Jashhuk (Zoer), r5am@mail.ru
  */
@@ -34,9 +32,15 @@ class CommandLineArguments implements Serializable {
     )
     boolean firefox;
 
+    @Option(name = "-r",
+            aliases = "--resolution",
+            usage = "Resolution, browser window size, for example '800,600'."
+    )
+    String browserResolution;
+
     // все остальные неописанные аргументы
-    @Argument
-    List<String> extraArgs = new ArrayList<>();
+//    @Argument
+//    List<String> extraArgs = new ArrayList<>();
 
     @Override
     public String toString() {
