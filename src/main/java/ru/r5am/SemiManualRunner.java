@@ -103,7 +103,6 @@ public class SemiManualRunner {
                                                ).split("//")[1].split("/")[0];
         if (driver != null) {
             driver.get("http://" + siteName);
-
         }
 
         // Доступен ли сайт?
@@ -113,7 +112,7 @@ public class SemiManualRunner {
         // Проверить залогинены ли в личном кабинете и разлогиниться
         boolean status = getLoginStatus(driver);
         if(status) loginOut(driver);       // Разлогиниваемся
-/*
+
         // Логинимся
         AuthESIA login = new AuthESIA();
         login.goToPageSNILS(driver);
@@ -142,7 +141,17 @@ public class SemiManualRunner {
         );
         login.inputPassword(driver, userPassword);
         login.setInputESIAButton(driver);           // Нажать кнопку 'Войти'
-*/
+
+
+        // Переход по ссылке из тестового скрипта к услуге
+        String servicePage = getValueFromXMLConfig(testScriptNameFile, pathToConfigs,
+                "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='serviceDirectLink']/following-sibling::*"
+        );
+        if (driver != null) {
+            driver.get(servicePage);
+        }
+
+
         // Ждём  N миллисекунд - посмотреть на результат до закрытия браузера
         sleep(5000);
 
@@ -154,6 +163,8 @@ public class SemiManualRunner {
         }
         System.out.println("Окончание работы: " + dateFormat.format(new Date()));
     }
+
+    ///===========================================================================================================///
 
     /**
      * Проверяет налие файла. Если файла нет, то выход из приложения.
