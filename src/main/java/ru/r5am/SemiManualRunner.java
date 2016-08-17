@@ -11,7 +11,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -19,6 +18,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -50,8 +50,14 @@ public class SemiManualRunner {
         CommandLineArguments arguments = getCommandLineArguments(args);
 
         // Имя файла тестового скрипта
-        String testScriptNameFile = "U" + arguments.testNumber + ".online.xml";
-        // System.out.println("Имя файла тестового скрипта: " + testScriptNameFile);
+        String testScriptNameFile = null;
+        if(arguments.testNumber != null) {
+            testScriptNameFile = "U" + arguments.testNumber + ".online.xml";
+            // System.out.println("Имя файла тестового скрипта: " + testScriptNameFile);
+        } else {
+            System.out.println("\nНе указан номер теста в параметрах командной строки.\n");
+            System.exit(1);
+        }
 
         // Обработка XML-конфигов
         String pathToConfigs;
@@ -62,24 +68,14 @@ public class SemiManualRunner {
             System.out.println("Работаем на тестовом сервере");
             pathToConfigs = "src\\main\\resources\\test_configs\\";
         }
-        /*  TODO: Всё вместе пока не нужно
-        // Считываем конфиги
-        try {
-            NodeList nodesOnlineSettings = getXMLConfigNodeList(ONLINE_SETTINGS_CONFIG_FILE, pathToConfigs);
-            NodeList nodesTestRuntime = getXMLConfigNodeList(TEST_RUNTIME_CONFIG_FILE, pathToConfigs);
-            NodeList nodesTestPropertiesOnline = getXMLConfigNodeList(TESTPROPERTIES_ONLINE_FILE, pathToConfigs);
-            NodeList nodesUTestNumberOnline = getXMLConfigNodeList(testScriptNameFile, pathToConfigs);
-        } catch (IOException e) {
-            System.out.println("Ошибка при чтении XML конфигов: " + e.toString());
-            System.exit(1);
-        }
-        */
-/*        // Выводим проверочный результат - значения параметров из XML файла
-        for (int i = 0; i < nodesUTestNumberOnline.getLength() ; i++) {
-            System.out.println(nodesUTestNumberOnline.item(i).getLocalName() + ": " +
-                               nodesUTestNumberOnline.item(i).getTextContent() );
-        }
-*/
+
+        // Проверить наличие конфигурационных файлов
+        // TODO: Сделать перебор по списку имён файлов
+        fileExist(testScriptNameFile, pathToConfigs);
+        fileExist(ONLINE_SETTINGS_CONFIG_FILE, pathToConfigs);
+        fileExist(TEST_RUNTIME_CONFIG_FILE, pathToConfigs);
+        fileExist(TEST_PROPERTIES_ONLINE_FILE, pathToConfigs);
+
 
         // Запускаем требуемый браузер
         WebDriver driver = null;
@@ -147,8 +143,8 @@ public class SemiManualRunner {
         login.inputPassword(driver, userPassword);
         login.setInputESIAButton(driver);           // Нажать кнопку 'Войти'
 */
-        // Ждём 15 секунд - посмотреть на результат до закрытия браузера
-        sleep(15000);
+        // Ждём  N миллисекунд - посмотреть на результат до закрытия браузера
+        sleep(5000);
 
 
 
@@ -157,6 +153,19 @@ public class SemiManualRunner {
             driver.quit();  // Покинуть driver, закрыть связанные с ним окна
         }
         System.out.println("Окончание работы: " + dateFormat.format(new Date()));
+    }
+
+    /**
+     * Проверяет налие файла. Если файла нет, то выход из приложения.
+     * @param fileName - имя файла
+     * @param pathToFile - путь до файла
+     */
+    private static void fileExist(String fileName, String pathToFile) {
+        File file = new File(pathToFile + fileName);
+        if (!(file.exists() && file.isFile())) {
+            System.out.println("Файл " + fileName + " не существует.");
+            System.exit(1);
+        }
     }
 
 

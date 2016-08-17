@@ -1,5 +1,6 @@
 ﻿.gradle
 .idea
 *.iml
+TODO.txt
 build/
 out/
