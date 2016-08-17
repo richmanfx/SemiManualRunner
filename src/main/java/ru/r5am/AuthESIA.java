@@ -41,6 +41,7 @@ class AuthESIA {
      */
     void inputSNILS(WebDriver driver, String sNILNumbers) {
         WebElement sNILSField = driver.findElement(By.xpath(".//input[@id='snils']"));
+        sNILSField.sendKeys("\u0008");      // Послать "забой" - привет FF!
         sNILSField.sendKeys(sNILNumbers);
     }
 

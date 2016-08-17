@@ -4,13 +4,12 @@ package ru.r5am;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -27,10 +26,10 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.sleep;
 
 public class SemiManualRunner {
-    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, InterruptedException {
+    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException,
+                                                  XPathExpressionException, InterruptedException {
 
         // Расположение chromedriver.exe
         String PATH_TO_CHROMEDRIVER_EXE = "src\\main\\resources\\web_drivers\\chromedriver.exe";
@@ -104,17 +103,22 @@ public class SemiManualRunner {
         if (driver != null) {
             driver.get("http://" + siteName);
         }
+//        inputSymbol();
 
         // Доступен ли сайт?
         siteAvailable(driver);
+//        inputSymbol();
 
         // Проверить залогинены ли в личном кабинете и разлогиниться
         boolean status = getLoginStatus(driver);
         if(status) loginOut(driver);       // Разлогиниваемся
+//        inputSymbol();
 
         // Логинимся
+        // Идём на страницу ЕСИА
         AuthESIA login = new AuthESIA();
         login.goToPageSNILS(driver);
+//        inputSymbol();
 
         // Получить номер СНИЛСа из XML файла
         String name;    // Разные имена user-а для тестовых и продакшн серверов
@@ -127,6 +131,7 @@ public class SemiManualRunner {
                 "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='" + name + "']/following-sibling::*"
         );
         login.inputSNILS(driver, sNILNumbers);      // Ввести СНИЛС
+//        inputSymbol();
 
         // Получить пароль из XML файла
         String password;    // Разные пароли user-а могут быть для тестовых и продакшн серверов
@@ -139,7 +144,26 @@ public class SemiManualRunner {
                 "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='" + password + "']/following-sibling::*"
         );
         login.inputPassword(driver, userPassword);
+//        inputSymbol();
         login.setInputESIAButton(driver);           // Нажать кнопку 'Войти'
+
+
+        // Обработать всплывающее в FF окно про: "Информация, введённая вами на этой странице, будет отправлена по
+        // незащищённому соединению и может быть прочитана третьей стороной".
+        Alert alert = null;
+        int timeOut = 5;    // Время ожидания всплывающего окна
+        if (driver != null) {
+            try {
+                alert = (new WebDriverWait(driver, timeOut)).until(ExpectedConditions.alertIsPresent());
+            } catch (TimeoutException e) {
+                System.out.println("Всплывающее окно не всплыло.");
+            }
+        }
+        if(alert != null) {           // Если Алерт возник, то жмём в нём ОК.
+            driver.switchTo().alert().accept();
+            System.out.println("Закрыли popup окно.");
+        }
+
 
         // Переход по ссылке из тестового скрипта к услуге
         String servicePage = getValueFromXMLConfig(testScriptNameFile, pathToConfigs,
@@ -148,9 +172,10 @@ public class SemiManualRunner {
         if (driver != null) {
             driver.get(servicePage);
         }
+//        inputSymbol();
 
-        // System.out.println("\nЗдесь можно нажать 'Q' чтобы выйти, а браузер оставить открытым.\n");
-        inputSymbol();
+         System.out.println("\nЗдесь можно нажать 'Q' чтобы выйти, а браузер оставить открытым.\n");
+          inputSymbol();
 
         // Ждём  N миллисекунд - посмотреть на результат до закрытия браузера
         // sleep(10000);
@@ -163,6 +188,8 @@ public class SemiManualRunner {
         }
         System.out.println("Окончание работы: " + dateFormat.format(new Date()));
     }
+
+    ///===========================================================================================================///й
 
     /**
      * Считывает символ с консоли, при 'q', 'Q', 'й', 'Й' - выход из приложения,
@@ -180,8 +207,6 @@ public class SemiManualRunner {
                 break;
         }
     }
-
-    ///===========================================================================================================///
 
     /**
      * Проверяет налие файла. Если файла нет, то выход из приложения.
