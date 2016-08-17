@@ -108,7 +108,6 @@ public class SemiManualRunner {
         // Доступен ли сайт?
         siteAvailable(driver);
 
-
         // Проверить залогинены ли в личном кабинете и разлогиниться
         boolean status = getLoginStatus(driver);
         if(status) loginOut(driver);       // Разлогиниваемся
@@ -142,7 +141,6 @@ public class SemiManualRunner {
         login.inputPassword(driver, userPassword);
         login.setInputESIAButton(driver);           // Нажать кнопку 'Войти'
 
-
         // Переход по ссылке из тестового скрипта к услуге
         String servicePage = getValueFromXMLConfig(testScriptNameFile, pathToConfigs,
                 "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='serviceDirectLink']/following-sibling::*"
@@ -151,9 +149,11 @@ public class SemiManualRunner {
             driver.get(servicePage);
         }
 
+        // System.out.println("\nЗдесь можно нажать 'Q' чтобы выйти, а браузер оставить открытым.\n");
+        inputSymbol();
 
         // Ждём  N миллисекунд - посмотреть на результат до закрытия браузера
-        sleep(5000);
+        // sleep(10000);
 
 
 
@@ -162,6 +162,23 @@ public class SemiManualRunner {
             driver.quit();  // Покинуть driver, закрыть связанные с ним окна
         }
         System.out.println("Окончание работы: " + dateFormat.format(new Date()));
+    }
+
+    /**
+     * Считывает символ с консоли, при 'q', 'Q', 'й', 'Й' - выход из приложения,
+     * при n, N, т, Т - ничего не делаем, при других символах - снова считываем
+     * @throws IOException -
+     */
+    private static void inputSymbol() throws IOException {
+        while (true){
+            System.out.println("Нажми 'n' и 'Enter' для продолжения, 'q' и 'Enter' - для выхода.");
+            int symbol = System.in.read();
+//            System.out.print(symbol + "\n");
+            if((symbol == 113) || (symbol == 81) || (symbol == 185) || (symbol == 153))
+                System.exit(2);
+            if((symbol == 110) || (symbol == 78) || (symbol == 130) || (symbol == 162))
+                break;
+        }
     }
 
     ///===========================================================================================================///
@@ -178,7 +195,6 @@ public class SemiManualRunner {
             System.exit(1);
         }
     }
-
 
     /**
      * Проверяет доступность сайта и, если недоступен, выходит из программы.
@@ -205,7 +221,6 @@ public class SemiManualRunner {
         // Удостовериться, что user залогинен
         WebElement userNameLine = driver.findElement(By.xpath("//span[@class='user__name__line']"));
         if(userNameLine != null) {
-
             // Нажать кнопку "Выход"
             WebElement exitButton = driver.findElement(By.xpath("//a[@class='btn' and text()='Выход']"));
             exitButton.click();
@@ -227,7 +242,6 @@ public class SemiManualRunner {
             System.out.println("Не дождались кнопки 'Личный кабинет'.");
             loginStatus = true;     // Залогинены
         }
-
         return loginStatus;
     }
 
@@ -264,28 +278,6 @@ public class SemiManualRunner {
         }
         return driver;
     }
-
-/*      Пока не нужен - не понял как искать параметры в DOM-документе
-    private static NodeList getXMLConfigNodeList(String ONLINE_SETTINGS_CONFIG_FILE, String pathToConfigs)
-                        throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-        // Загрузить конфиг в объект Document
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);        // Никогда не забывай об этом!
-        DocumentBuilder builder = factory.newDocumentBuilder();
-//            System.out.println("Файл: " + pathToConfigs + ONLINE_SETTINGS_CONFIG_FILE);
-        Document doc = builder.parse(pathToConfigs + ONLINE_SETTINGS_CONFIG_FILE);
-        // Создать XPathFactory
-        XPathFactory myXPathFactory = XPathFactory.newInstance();
-        // Используется эта фабрика для создания объекта XPath
-        XPath xpath = myXPathFactory.newXPath();
-        // XPath компилирует XPath-выражение
-        XPathExpression expr = xpath.compile("//*");
-        // Выполнить запрос XPath для получения результата
-        Object result = expr.evaluate(doc, XPathConstants.NODESET);
-        // сохранить результат в DOM NodeList
-        return (NodeList) result;
-    }
-*/
 
     /**
      *
