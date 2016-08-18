@@ -31,10 +31,15 @@ public class SemiManualRunner {
 
         // Расположение chromedriver.exe
         String PATH_TO_CHROMEDRIVER_EXE = "src\\main\\resources\\web_drivers\\chromedriver.exe";
-        // Имена конфигурационных файлов
+
+        // Конфигурационные файлы
+        List<String> configFiles = new ArrayList<>();
         String ONLINE_SETTINGS_CONFIG_FILE = "online.settings.xml";
+        configFiles.add(ONLINE_SETTINGS_CONFIG_FILE);       // В коллекцию
         String TEST_RUNTIME_CONFIG_FILE = "test.runtime.xml";
+        configFiles.add(TEST_RUNTIME_CONFIG_FILE);
         String TEST_PROPERTIES_ONLINE_FILE = "testProperties.online.xml";
+        configFiles.add(TEST_PROPERTIES_ONLINE_FILE);
 
         // Форматируем дату и время, выставляем временнУю зону Москвы
         TimeZone tz = TimeZone.getTimeZone("Europe/Moscow");
@@ -55,6 +60,7 @@ public class SemiManualRunner {
             System.out.println("\nНе указан номер теста в параметрах командной строки.\n");
             System.exit(1);
         }
+        configFiles.add(testScriptNameFile);        // В коллекцию
 
         // Обработка XML-конфигов
         String pathToConfigs;
@@ -67,11 +73,6 @@ public class SemiManualRunner {
         }
 
         // Проверить наличие конфигурационных файлов
-        List<String> configFiles = new ArrayList<>();
-        configFiles.add(testScriptNameFile);
-        configFiles.add(ONLINE_SETTINGS_CONFIG_FILE);
-        configFiles.add(TEST_RUNTIME_CONFIG_FILE);
-        configFiles.add(TEST_PROPERTIES_ONLINE_FILE);
         configFiles.forEach(configFile->fileExist(configFile, pathToConfigs ));
 
 
@@ -145,6 +146,7 @@ public class SemiManualRunner {
         login.inputPassword(driver, userPassword);
 //        inputSymbol();
         login.setInputESIAButton(driver);           // Нажать кнопку 'Войти'
+//        inputSymbol();
 
 
         // Обработать всплывающее в FF окно про: "Информация, введённая вами на этой странице, будет отправлена по
@@ -162,6 +164,17 @@ public class SemiManualRunner {
             driver.switchTo().alert().accept();
             System.out.println("Закрыли popup окно.");
         }
+//        inputSymbol();
+
+        // Входим на продакшн сервере как частное лицо
+        if(arguments.production) {
+            if (driver != null) {
+                WebElement privatePersonButton = driver.findElement(By.xpath("//div[@onclick='orgPage.selectPso();']"));
+                privatePersonButton.click();
+            }
+        }
+//        inputSymbol();
+
 
 
         // Переход по ссылке из тестового скрипта к услуге
@@ -348,6 +361,7 @@ public class SemiManualRunner {
         } catch (CmdLineException e) {
             System.err.println("Ошибка в агументах командной строки: " + e.toString());
             parser.printUsage(System.out);
+            System.exit(1);
         }
 
         if(arguments.testNumber != null)
