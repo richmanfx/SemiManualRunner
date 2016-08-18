@@ -21,9 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -69,11 +67,12 @@ public class SemiManualRunner {
         }
 
         // Проверить наличие конфигурационных файлов
-        // TODO: Сделать перебор по списку имён файлов
-        fileExist(testScriptNameFile, pathToConfigs);
-        fileExist(ONLINE_SETTINGS_CONFIG_FILE, pathToConfigs);
-        fileExist(TEST_RUNTIME_CONFIG_FILE, pathToConfigs);
-        fileExist(TEST_PROPERTIES_ONLINE_FILE, pathToConfigs);
+        List<String> configFiles = new ArrayList<>();
+        configFiles.add(testScriptNameFile);
+        configFiles.add(ONLINE_SETTINGS_CONFIG_FILE);
+        configFiles.add(TEST_RUNTIME_CONFIG_FILE);
+        configFiles.add(TEST_PROPERTIES_ONLINE_FILE);
+        configFiles.forEach(configFile->fileExist(configFile, pathToConfigs ));
 
 
         // Запускаем требуемый браузер
