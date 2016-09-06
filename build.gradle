@@ -21,7 +21,8 @@ repositories {
 // Зависимости для приложения и тестирования кода
 dependencies {
     compile     group: 'args4j', name: 'args4j', version: '2.33'
-    compile 'org.seleniumhq.selenium:selenium-java:2.53.1'		// Selenium 2.53.1 нормально работает с FireFox 47.0.1
+    compile     'org.seleniumhq.selenium:selenium-java:2.53.1'		// Selenium 2.53.1 нормально работает с FireFox 47.0.1
+   // compile     group: 'com.codeborne', name: 'selenide', version: '3.9.2'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 

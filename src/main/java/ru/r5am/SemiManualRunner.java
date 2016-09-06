@@ -5,6 +5,7 @@ package ru.r5am;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class SemiManualRunner {
     public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException,
                                                   XPathExpressionException, InterruptedException {
+
 
         // Расположение chromedriver.exe
         String PATH_TO_CHROMEDRIVER_EXE = "src\\main\\resources\\web_drivers\\chromedriver.exe";
@@ -68,7 +70,7 @@ public class SemiManualRunner {
             System.out.println("Работаем на продакшн сервере.");
             pathToConfigs = "src\\main\\resources\\prod_configs\\";
         } else {
-            System.out.println("Работаем на тестовом сервере");
+            System.out.println("Работаем на тестовом сервере.");
             pathToConfigs = "src\\main\\resources\\test_configs\\";
         }
 
@@ -80,10 +82,10 @@ public class SemiManualRunner {
         WebDriver driver = null;
         try {
             if (arguments.firefox) {
-                System.out.println("Используется Firefox");
+                System.out.println("Используется Firefox.");
                 driver = startFirefox(arguments.browserResolution);
             } else {
-                System.out.println("Используется Chrome (по-умолчанию)");
+                System.out.println("Используется Chrome (по умолчанию).");
                 driver = startChrome(PATH_TO_CHROMEDRIVER_EXE, arguments.browserResolution);
             }
         } catch (Exception e) {
@@ -103,21 +105,36 @@ public class SemiManualRunner {
         if (driver != null) {
             driver.get("http://" + siteName);
         }
-//        inputSymbol();
+        System.out.println("Открыли страницу: " + siteName);
+//       inputSymbol();
 
         // Доступен ли сайт?
-        siteAvailable(driver);
+        boolean siteStatus = siteAvailable(driver);
+        if(siteStatus) System.out.println("Сайт " + siteName + " доступен.");
 //        inputSymbol();
-
+/*
         // Проверить залогинены ли в личном кабинете и разлогиниться
         boolean status = getLoginStatus(driver);
         if(status) loginOut(driver);       // Разлогиниваемся
-//        inputSymbol();
+        inputSymbol();
+*/
+
+        // Закрыть всплывающее окно "Уважаемые пользователи"
+        try {
+            WebElement closeButton = driver.findElement(By.xpath("//a[text()='Закрыть']"));
+            closeButton.click();
+        } catch (NoSuchElementException e) {
+            System.out.println("Не нашлась кнопка 'Закрыть' всплывающего окна 'Уважаемые пользователи'.");
+            driver.quit();
+            System.exit(1);
+        }
+        System.out.println("Закрыли окно 'Уважаемые пользователи'.");
 
         // Логинимся
         // Идём на страницу ЕСИА
         AuthESIA login = new AuthESIA();
         login.goToPageSNILS(driver);
+        System.out.println("Перешли на страницу авторизации.");
 //        inputSymbol();
 
         // Получить номер СНИЛСа из XML файла
@@ -131,6 +148,7 @@ public class SemiManualRunner {
                 "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='" + name + "']/following-sibling::*"
         );
         login.inputSNILS(driver, sNILNumbers);      // Ввести СНИЛС
+        System.out.println("СНИЛС введён.");
 //        inputSymbol();
 
         // Получить пароль из XML файла
@@ -144,8 +162,10 @@ public class SemiManualRunner {
                 "ONLINE_DATA_DOCUMENT/PARAMETERS/NAME[text()='" + password + "']/following-sibling::*"
         );
         login.inputPassword(driver, userPassword);
+        System.out.println("Пароль введён.");
 //        inputSymbol();
         login.setInputESIAButton(driver);           // Нажать кнопку 'Войти'
+        System.out.println("Нажата кнопка 'Войти'.");
 //        inputSymbol();
 
 
@@ -184,7 +204,7 @@ public class SemiManualRunner {
         if (driver != null) {
             driver.get(servicePage);
         }
-//        inputSymbol();
+        inputSymbol();
 
          System.out.println("\nЗдесь можно нажать 'Q' чтобы выйти, а браузер оставить открытым.\n");
           inputSymbol();
@@ -228,7 +248,7 @@ public class SemiManualRunner {
     private static void fileExist(String fileName, String pathToFile) {
         File file = new File(pathToFile + fileName);
         if (!(file.exists() && file.isFile())) {
-            System.out.println("Файл " + fileName + " не существует.");
+            System.out.println("Файл '" + fileName + "' в папке '" + pathToFile + "' не существует.");
             System.exit(1);
         }
     }
@@ -237,17 +257,22 @@ public class SemiManualRunner {
      * Проверяет доступность сайта и, если недоступен, выходит из программы.
      * @param driver Экземпляр WebDriver-а
      */
-    private static void siteAvailable(WebDriver driver) {
+    private static boolean siteAvailable(WebDriver driver) {
         // Доступен ли сайт?
         String siteTitle = null;
+        boolean siteStatus = false;
         if (driver != null) {
             siteTitle = driver.getTitle();
+            siteStatus = true;
         }
+
         if (siteTitle != null && siteTitle.contains("недоступен")) {
             System.out.println("Сайт " + siteTitle + ".");
             driver.quit();
             System.exit(1);
         }
+
+        return siteStatus;
     }
 
     /**

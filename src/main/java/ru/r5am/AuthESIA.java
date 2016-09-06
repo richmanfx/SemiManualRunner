@@ -3,6 +3,7 @@ package ru.r5am;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+//import org.openqa.selenium.support.FindBy;
 
 /**
  * Created by Aleksandr Jashhuk (Zoer) on 16.08.2016.
@@ -10,6 +11,8 @@ import org.openqa.selenium.WebElement;
  */
 class AuthESIA {
 
+//    @FindBy(xpath = "")               // Стас показывал способ с аннотацией
+//    WebElement test;
     /**
      *  Переход на страницу авторизации по СНИЛС
      *  @param driver - экземпляр WebDriver
